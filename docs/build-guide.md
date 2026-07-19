@@ -23,19 +23,29 @@ won't do anything useful yet without your credentials, but it must compile).
 ## Phase 1 — Spotify credentials + refresh token
 
 The device reads your "now playing" through the Spotify Web API. That needs a
-one-time login to mint a long-lived **refresh token**.
+one-time login to mint a long-lived **refresh token**. You can do this **before
+any hardware arrives** — it's just a laptop step.
 
 1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
    → **Create app**. Name it anything. Tick **Web API**. Save.
 2. Copy the **Client ID** and **Client Secret**.
+
+**Path A — laptop only (recommended, no ESP32 needed):**
+
+3. Add this exact Redirect URI in the dashboard: `http://127.0.0.1:8888/callback`
+4. Open [`tools/get_refresh_token_laptop.py`](../tools/get_refresh_token_laptop.py),
+   put your Client ID/Secret at the top (or set env vars `CLIENT_ID`/`CLIENT_SECRET`).
+5. Run `python tools/get_refresh_token_laptop.py`. A browser opens; log in /
+   authorise; the **refresh token** prints in the terminal and on the page.
+
+**Path B — on the ESP32 (if you prefer, once you have the board):**
+
 3. Open [`tools/getRefreshToken/getRefreshToken.ino`](../tools/getRefreshToken/getRefreshToken.ino)
-   in the Arduino IDE (install the **spotify-api-arduino** library by Brian Lough
-   via Library Manager). Fill in WiFi + Client ID/Secret at the top. Upload.
-4. Open Serial Monitor @ 115200. It prints the board's IP and the exact **Redirect
-   URI** to register, e.g. `http://192.168.1.42/callback`.
-5. Back in the dashboard, add that Redirect URI **exactly**. Save.
-6. In a browser on the same WiFi, open `http://<board-ip>/`. Log in / authorise.
-   The page and Serial Monitor print your **refresh token**.
+   in the Arduino IDE (install the **spotify-api-arduino** library by Brian Lough).
+   Fill in WiFi + Client ID/Secret. Upload.
+4. Serial Monitor @ 115200 prints the board's IP + the Redirect URI to register
+   (`http://<board-ip>/callback`); add it in the dashboard, then open
+   `http://<board-ip>/` and authorise.
 
 **Check:** you have three strings — Client ID, Client Secret, and a long refresh
 token.
