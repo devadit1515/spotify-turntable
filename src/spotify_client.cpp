@@ -9,7 +9,17 @@
 // Dedicated TLS client for the API. Album art uses its own client so the two
 // HTTPS connections never stomp on each other.
 static WiFiClientSecure spotifyTLS;
-static SpotifyArduino  *spotify = nullptr;
+
+// IMPORTANT: this is a file-scope (static-storage) object, NOT `new`. Static
+// objects are zero-initialised before their constructor runs, so SpotifyArduino's
+// internal _refreshToken pointer is genuinely NULL when the constructor calls
+// setRefreshToken(). The library does `delete _refreshToken` there without ever
+// initialising it — with `new` (and ESP32 heap poisoning on) that pointer is
+// garbage and the delete corrupts the heap → crash. Zero-init side-steps the bug.
+static SpotifyArduino spotify(spotifyTLS,
+                              SPOTIFY_CLIENT_ID,
+                              SPOTIFY_CLIENT_SECRET,
+                              SPOTIFY_REFRESH_TOKEN);
 
 static uint32_t        lastRefreshMs = 0;
 static const uint32_t  TOKEN_REFRESH_INTERVAL = 50UL * 60UL * 1000UL;  // 50 min
@@ -70,13 +80,8 @@ void spotifyInit() {
   // (see docs/build-guide.md for the PKCE/proxy hardening path).
   spotifyTLS.setInsecure();
 
-  spotify = new SpotifyArduino(spotifyTLS,
-                               SPOTIFY_CLIENT_ID,
-                               SPOTIFY_CLIENT_SECRET,
-                               SPOTIFY_REFRESH_TOKEN);
-
   Serial.println(F("[spotify] refreshing access token..."));
-  if (spotify->refreshAccessToken()) {
+  if (spotify.refreshAccessToken()) {
     Serial.println(F("[spotify] access token OK"));
     lastRefreshMs = millis();
   } else {
@@ -85,15 +90,13 @@ void spotifyInit() {
 }
 
 void spotifyPollOnce() {
-  if (!spotify) return;
-
   // Proactive refresh (access tokens live ~60 min).
   if (millis() - lastRefreshMs > TOKEN_REFRESH_INTERVAL) {
-    if (spotify->refreshAccessToken()) lastRefreshMs = millis();
+    if (spotify.refreshAccessToken()) lastRefreshMs = millis();
   }
 
   pendingArtFetch = false;
-  int status = spotify->getCurrentlyPlaying(onCurrentlyPlaying, SPOTIFY_MARKET);
+  int status = spotify.getCurrentlyPlaying(onCurrentlyPlaying, SPOTIFY_MARKET);
 
   switch (status) {
     case 200:
@@ -108,7 +111,7 @@ void spotifyPollOnce() {
       break;
     case 401:
       Serial.println(F("[spotify] 401 — token expired, refreshing"));
-      if (spotify->refreshAccessToken()) lastRefreshMs = millis();
+      if (spotify.refreshAccessToken()) lastRefreshMs = millis();
       break;
     case 429:
       Serial.println(F("[spotify] 429 rate-limited — backing off 5s"));
