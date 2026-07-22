@@ -12,11 +12,11 @@
 $fn = 120;
 
 // ── RGB matrix panel (P3 64×64) ──────────────────────────────────────────────
-panel_px     = 64;
-panel_pitch  = 3.0;                 // P3 = 3 mm pixel pitch
-panel_w      = panel_px * panel_pitch;   // ≈ 192 mm (measure yours!)
-panel_h      = panel_px * panel_pitch;   // ≈ 192 mm
-panel_depth  = 14;                  // module thickness incl. LEDs (no connectors)
+panel_px     = 32;
+panel_pitch  = 6.0;                 // P6 = 6 mm pixel pitch
+panel_w      = 190;                 // measured: 7.5 in ≈ 190 mm
+panel_h      = 190;                 // measured: 7.5 in ≈ 190 mm
+panel_depth  = 15;                  // module thickness front→back, no connectors (refine when measured)
 panel_border = 2;                   // dead PCB border around the lit area
 
 // ── Acrylic diffuser ─────────────────────────────────────────────────────────
