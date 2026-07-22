@@ -15,8 +15,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
-static const int ART_W = 64;
-static const int ART_H = 64;
+// Panel resolution — the single source of truth. This build targets a 32×32
+// HUB75 panel. If you swap to a 64×64 later, change BOTH of these to 64 and the
+// display code re-expands automatically (art + caption band + progress bar).
+static const int ART_W = 32;
+static const int ART_H = 32;
 
 struct PlaybackState {
   char     trackId[48]    = {0};   // Spotify track id (used to detect track change)

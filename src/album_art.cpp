@@ -29,30 +29,21 @@ static int jpegDrawBlock(JPEGDRAW *p) {
   return 1;  // keep going
 }
 
-// Map a JPEGDEC scale option to the bit-shift it applies to the dimensions.
-static int scaleShift(int opt) {
-  switch (opt) {
-    case JPEG_SCALE_HALF:    return 1;
-    case JPEG_SCALE_QUARTER: return 2;
-    case JPEG_SCALE_EIGHTH:  return 3;
-    default:                 return 0;
-  }
-}
-
 static bool decodeToScratch(uint8_t *data, size_t size) {
   if (!jpeg.openRAM(data, (int)size, jpegDrawBlock)) return false;
 
   const int w = jpeg.getWidth();
   const int h = jpeg.getHeight();
 
-  // Choose the largest power-of-two downscale that still overfills 64×64, so we
-  // keep as much detail as possible then center-crop.
-  int opt = 0;
-  if      (w >= 512 || h >= 512) opt = JPEG_SCALE_EIGHTH;
-  else if (w >= 256 || h >= 256) opt = JPEG_SCALE_QUARTER;   // 300 → 75
-  else if (w >= 128 || h >= 128) opt = JPEG_SCALE_HALF;
-
-  const int shift = scaleShift(opt);
+  // Choose the largest power-of-two downscale that still fills ART_W×ART_H, then
+  // center-crop. Target-based so it's correct for any panel size AND any Spotify
+  // image size (e.g. a 64×64 source into a 32×32 panel → JPEG_SCALE_HALF).
+  int shift = 0;
+  while (shift < 3 && (w >> (shift + 1)) >= ART_W && (h >> (shift + 1)) >= ART_H) shift++;
+  const int opt = (shift == 1) ? JPEG_SCALE_HALF
+                : (shift == 2) ? JPEG_SCALE_QUARTER
+                : (shift == 3) ? JPEG_SCALE_EIGHTH
+                : 0;
   const int dw = w >> shift;
   const int dh = h >> shift;
 
