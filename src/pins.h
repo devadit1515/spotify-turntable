@@ -32,10 +32,15 @@
 // Remapped off the original 11/12/38/39 because those holes had leftover solder
 // stuck in them. 1/2/41/42 are fresh, free, output-capable, and don't clash with
 // the HUB75 panel. (41 was an optional-mic pin; the mic isn't fitted, so it's free.)
+//
+// Order matters: IN1..IN4 must fire the driver's coils in physical A→B→C→D order
+// or the motor vibrates instead of turning. On this build the wires landed such
+// that A=GPIO1, B=GPIO41, C=GPIO2, D=GPIO42 (verified with the coil-check test),
+// so the pins are listed in that firing order rather than by GPIO number.
 #define PIN_MOTOR_IN1 1
-#define PIN_MOTOR_IN2 2
-#define PIN_MOTOR_IN3 42
-#define PIN_MOTOR_IN4 41
+#define PIN_MOTOR_IN2 41
+#define PIN_MOTOR_IN3 2
+#define PIN_MOTOR_IN4 42
 
 // ── WS2812B halo ring ────────────────────────────────────────────────────────
 #define PIN_LED_DIN   40
