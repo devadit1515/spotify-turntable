@@ -29,10 +29,13 @@
 #define PIN_CLK 13
 
 // ── 28BYJ-48 stepper via ULN2003 (record spin) ───────────────────────────────
-#define PIN_MOTOR_IN1 11
-#define PIN_MOTOR_IN2 12
-#define PIN_MOTOR_IN3 38
-#define PIN_MOTOR_IN4 39
+// Remapped off the original 11/12/38/39 because those holes had leftover solder
+// stuck in them. 1/2/41/42 are fresh, free, output-capable, and don't clash with
+// the HUB75 panel. (41 was an optional-mic pin; the mic isn't fitted, so it's free.)
+#define PIN_MOTOR_IN1 1
+#define PIN_MOTOR_IN2 2
+#define PIN_MOTOR_IN3 42
+#define PIN_MOTOR_IN4 41
 
 // ── WS2812B halo ring ────────────────────────────────────────────────────────
 #define PIN_LED_DIN   40
