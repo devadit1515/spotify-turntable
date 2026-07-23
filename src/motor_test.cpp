@@ -14,16 +14,13 @@
 // The four ULN2003 inputs, in order. If you remap in pins.h, this follows.
 static const int IN[4] = { PIN_MOTOR_IN1, PIN_MOTOR_IN2, PIN_MOTOR_IN3, PIN_MOTOR_IN4 };
 
-// 28BYJ-48 half-step sequence (8 phases). Half-stepping = smoother + more torque
-// than full-step. Each row is which of the 4 coils are energised.
-static const uint8_t SEQ[8][4] = {
-  {1,0,0,0},
+// 28BYJ-48 FULL-step sequence (4 phases). Two coils energised every step =
+// ~2× the torque of half-step. We use full-step here so the motor can turn even
+// on a weak 3.3V supply (the ESP32's 5V pin is dead on this board).
+static const uint8_t SEQ[4][4] = {
   {1,1,0,0},
-  {0,1,0,0},
   {0,1,1,0},
-  {0,0,1,0},
   {0,0,1,1},
-  {0,0,0,1},
   {1,0,0,1},
 };
 
@@ -45,6 +42,6 @@ void loop() {
   for (int i = 0; i < 4; i++) {
     digitalWrite(IN[i], SEQ[phase][i] ? HIGH : LOW);
   }
-  phase = (phase + 1) & 7;      // next of 8 phases
-  delay(2);                     // 2 ms/half-step ≈ smooth slow spin
+  phase = (phase + 1) & 3;      // next of 4 full-step phases
+  delay(4);                     // 4 ms/step — slow enough to build torque on 3.3V
 }
