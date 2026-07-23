@@ -31,9 +31,11 @@ void setup() {
   HUB75_I2S_CFG mxconfig(W, H, 1 /* chain */, pinmap);
   mxconfig.double_buff = true;
   mxconfig.clkphase    = false;
-  // If the panel shows garbage/snow instead of clean colours, uncomment the
-  // next line — some 32×32 modules use the FM6126A driver chip and need init.
-  // mxconfig.driver = HUB75_I2S_CFG::FM6126A;
+  // This QIANGLI panel stays completely dark without the FM6126A wake-up
+  // sequence — enabling it here. (If it now shows garbage instead of black,
+  // that tells us the chip is actually a plain shift-register type; we'd remove
+  // this. But "totally black" is the classic FM6126A-not-initialised symptom.)
+  mxconfig.driver = HUB75_I2S_CFG::FM6126A;
 
   dma = new MatrixPanel_I2S_DMA(mxconfig);
   dma->begin();
