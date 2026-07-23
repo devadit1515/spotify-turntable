@@ -19,14 +19,15 @@
 #define PIN_B2  16
 // Row-address lines (A..E — E is required on a 64-high panel)
 #define PIN_A   18
-#define PIN_B    8
+#define PIN_B   47   // was 8  — 8 not broken out on this board; moved to 47
 #define PIN_C    9
 #define PIN_D   10
-#define PIN_E   14
+#define PIN_E   14   // unused on this 32-high (1/16-scan) panel — not wired
 // Control
-#define PIN_LAT 17
+#define PIN_LAT 45   // was 17 — 17 not broken out; moved to 45 (strapping pin,
+                     // but its default boot level is safe and LAT idles low)
 #define PIN_OE  21
-#define PIN_CLK 13
+#define PIN_CLK 48   // was 13 — 13 not broken out; moved to 48
 
 // ── 28BYJ-48 stepper via ULN2003 (record spin) ───────────────────────────────
 // Remapped off the original 11/12/38/39 because those holes had leftover solder
