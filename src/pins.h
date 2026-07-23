@@ -18,7 +18,9 @@
 #define PIN_G2  15
 #define PIN_B2  16
 // Row-address lines (A..E — E is required on a 64-high panel)
-#define PIN_A   18
+#define PIN_A    0   // was 18 — moved to 0 at user's request. NOTE: GPIO0 is the
+                     // boot-strapping pin; if a flash upload ever fails with the
+                     // panel connected, unplug this one wire while flashing.
 #define PIN_B   47   // was 8  — 8 not broken out on this board; moved to 47
 #define PIN_C    9
 #define PIN_D   10
